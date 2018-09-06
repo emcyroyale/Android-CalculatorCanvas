@@ -15,6 +15,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static String TAG = "Main.RotCal";
 
+    //Used to specify all potential operations used by the calculator
+    //Clear: Initialization/Clear Screen
+    //Plus: During addition
+    //Minus, Multiply, Divide: Analogous to Plus
     enum Operation
     {
         CLEAR, PLUS, MINUS, MULTIPLY, DIVIDE;
@@ -24,7 +28,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static String current_Result;
     private static String first_Operand, second_Operand;
     private static Operation current_Operation;
-    private static boolean finished_Typing;
+
+    //View in MVC
     TextView calc_Screen;
     TextView history_Screen;
 
@@ -33,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+        //Initialize View
         calc_Screen = (TextView) findViewById(R.id.calcScreen);
         history_Screen = (TextView) findViewById(R.id.histScreen);
         history_Screen.setMovementMethod(new ScrollingMovementMethod());
@@ -59,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.bdiv).setOnClickListener(this);
 
         findViewById(R.id.benter).setOnClickListener(this);
-
         findViewById(R.id.bc).setOnClickListener(this);
     }
 
@@ -99,11 +103,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.benter:
                 break;
         }
-
-
+        //Used to show past operations on the history screen
         updateHistoryView();
     }
 
+    //Method: typingValue
+    //Used to identify where a numerical or decimal button press gets appended to
+    //Consider that every operation has two operands
+    //How do we know which operand to append the button presses value to?
     void typingValue(String value)
     {
         if(current_Operation==Operation.CLEAR)
@@ -118,6 +125,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    //Method: typingOperation
+    //Used to identify what to do when given an operation button press
+    //If both operands are full then an operation button press indicates we are moving on the the next
+    //set of operands
+    //Otherwise we still need to wait for the operation to complete
+    //E.g.  Instead of waiting til 3+4+5+6=18 to evaluate
+    //      We evaluate at each step    3+4=7
+    //                                  7+5=12
+    //                                  12+6=18
     void typingOperation(Operation op)
     {
 
@@ -135,14 +151,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    void clearScreen()
-    {
-        calc_Screen.setText("");
-        first_Operand="";
-        second_Operand="";
-        current_Operation=Operation.CLEAR;
-    }
-
     double evaluate(String first, String second, Operation op)
     {
         Log.d(TAG, String.format("evaluate: %s, %s, %s", first, second, op.toString()));
@@ -157,6 +165,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return Double.valueOf(first) / Double.valueOf(second);
         }
         return 0;
+    }
+
+
+    /*--------------------------------------------------------
+        VIEW UPDATING METHODS
+     ---------------------------------------------------------*/
+
+    void clearScreen()
+    {
+        calc_Screen.setText("");
+        first_Operand="";
+        second_Operand="";
+        current_Operation=Operation.CLEAR;
     }
 
     void updateResultView(String value)
